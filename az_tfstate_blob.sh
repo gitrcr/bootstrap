@@ -6,9 +6,9 @@ random_id=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 service_principal_name="tfaz${random_id}-sp"
 
 # Datos de tu entorno
-RESOURCE_GROUP=tf_rg${random_id}
-STORAGE_ACCOUNT=tf_state${random_id}
-CONTAINER_NAME=tfstate_blob${random_id}
+RESOURCE_GROUP="rg-pyweb"
+STORAGE_ACCOUNT="genstorage-pyweb"
+CONTAINER_NAME="tfstate_blob-pyweb"
 
 echo "🚀 Iniciando configuración de Terraform en Azure..."
 
