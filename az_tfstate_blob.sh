@@ -4,14 +4,16 @@
 random_id=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 service_principal_name="tfaz${random_id}-sp"
 
+# Puedes modificar estos valores si lo deseas
 LOCATION="eastus"
 RESOURCE_GROUP="rg-terraform-state"
-STORAGE_ACCOUNT="st${random_id}tfstate"
+STORAGE_ACCOUNT="st${random_id}tfstate" # Debe ser único globalmente
 CONTAINER_NAME="tfstate"
+STATE_KEY="terraform.tfstate"
 
 echo "🚀 Iniciando despliegue de infraestructura para Terraform..."
 
-# --- 2. Crear Grupo de Recursos (Si no existe) ---
+# --- 2. Crear Grupo de Recursos ---
 echo "📦 Creando Grupo de Recursos: $RESOURCE_GROUP..."
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
 
@@ -58,74 +60,31 @@ az role assignment create \
   --role "Storage Blob Data Contributor" \
   --scope "$container_scope"
 
-# --- 8. Resultado Final ---
-echo ""
-echo "🎉 ¡Infraestructura y Permisos listos!"
-echo "Guarda estos valores en GitHub Secrets:"
-echo ""
-echo "ARM_CLIENT_ID=$client_id"
-echo "ARM_CLIENT_SECRET=$client_secret"
-echo "ARM_SUBSCRIPTION_ID=$subscription_id"
-echo "ARM_TENANT_ID=$tenant_id"
-echo ""
-echo "Y actualiza tu backend.tf con:"
-echo "  resource_group_name  = \"$RESOURCE_GROUP\""
-echo "  storage_account_name = \"$STORAGE_ACCOUNT\""
-echo "  container_name       = \"$CONTAINER_NAME\""
-echo "  use_azuread_auth     = true"   
-
-echo "🚀 Iniciando configuración de Terraform en Azure..."
-
-# --- 2. Obtener IDs de Suscripción y Tenant ---
-subscription_id=$(az account show --query id --output tsv)
-tenant_id=$(az account show --query tenantId --output tsv)
-echo "✅ Suscripción: $subscription_id"
-echo "✅ Tenant: $tenant_id"
-
-# --- 3. Crear Service Principal ---
-# Se crea con rol básico para permitir la asignación específica después
-echo "🔐 Creando Service Principal: $service_principal_name..."
-sp_output=$(az ad sp create-for-rbac \
-  --name "$service_principal_name" \
-  --role Reader \
-  --scopes "/subscriptions/$subscription_id" \
-  --output json)
-
-# Extraer credenciales del JSON
-client_id=$(echo $sp_output | jq -r '.appId')
-client_secret=$(echo $sp_output | jq -r '.password')
-object_id=$(az ad sp show --id $client_id --query id --output tsv)
-
-echo "✅ Service Principal creado (App ID: $client_id)"
-
-# --- 4. Asignar Permiso RBAC Específico al Contenedor (CLAVE) ---
-# Esto reemplaza la necesidad de SAS_TOKEN o Access Keys
-echo "🔑 Asignando rol 'Storage Blob Data Contributor' al contenedor..."
-
-# Construir el scope exacto del contenedor
-container_scope="/subscriptions/$subscription_id/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT/blobServices/default/containers/$CONTAINER_NAME"
-
-az role assignment create \
-  --assignee-object-id "$object_id" \
-  --assignee-principal-type "ServicePrincipal" \
-  --role "Storage Blob Data Contributor" \
-  --scope "$container_scope"
-
 if [ $? -eq 0 ]; then
-    echo "✅ Permiso RBAC asignado correctamente al contenedor."
+    echo "✅ Permiso RBAC asignado correctamente."
 else
-    echo "❌ Error al asignar el permiso RBAC. Verifica que el contenedor exista."
+    echo "❌ Error al asignar permisos."
     exit 1
 fi
 
-# --- 5. Mostrar Instrucciones para GitHub Secrets ---
+# --- 8. Generar Bloque JSON Único para GitHub ---
 echo ""
-echo "🎉 ¡Configuración completada!"
-echo "Guarda estos valores en los Secrets de tu repositorio GitHub:"
-echo ""
-echo "ARM_CLIENT_ID=$client_id"
-echo "ARM_CLIENT_SECRET=$client_secret"
-echo "ARM_SUBSCRIPTION_ID=$subscription_id"
-echo "ARM_TENANT_ID=$tenant_id"
-echo ""
-echo "⚠️  NOTA: No necesitas guardar ARM_SAS_TOKEN ni configurar resource_group_name en el backend si usas use_azuread_auth = true."   
+echo "🎉 ¡Infraestructura y Permisos listos!"
+echo "---------------------------------------------------------"
+echo "COPIA EL SIGUIENTE BLOQUE JSON Y GUÁRDALO EN GITHUB:"
+echo "Nombre del secreto: AZURE_CREDENTIALS"
+echo "---------------------------------------------------------"
+cat <<EOF
+{
+  "clientId": "$client_id",
+  "clientSecret": "$client_secret",
+  "subscriptionId": "$subscription_id",
+  "tenantId": "$tenant_id",
+  "resourceGroup": "$RESOURCE_GROUP",
+  "storageAccount": "$STORAGE_ACCOUNT",
+  "containerName": "$CONTAINER_NAME",
+  "key": "$STATE_KEY"
+}
+EOF
+echo "---------------------------------------------------------"
+echo "⚠️  IMPORTANTE: No añadas ningún otro secreto, este JSON lo contiene todo."   
