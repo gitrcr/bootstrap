@@ -1,25 +1,12 @@
 #!/bin/bash
 
 # --- 1. Configuración Inicial ---
-# Generar nombre automático para el SP
 random_id=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 service_principal_name="tfaz${random_id}-sp"
 
-# Datos de tu entorno
-RESOURCE_GROUP="rg-terraform-state"
-STORAGE_ACCOUNT="genstorage-pyweb"
-CONTAINER_NAME="tfstate"
-
-#!/bin/bash
-
-# --- 1. Configuración Inicial ---
-random_id=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-service_principal_name="tfaz${random_id}-sp"
-
-# MODIFICA ESTOS VALORES
 LOCATION="eastus"
 RESOURCE_GROUP="rg-terraform-state"
-STORAGE_ACCOUNT="st${random_id}tfstate" # Debe ser único globalmente
+STORAGE_ACCOUNT="st${random_id}tfstate"
 CONTAINER_NAME="tfstate"
 
 echo "🚀 Iniciando despliegue de infraestructura para Terraform..."
