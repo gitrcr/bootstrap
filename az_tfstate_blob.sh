@@ -16,7 +16,7 @@ read client_id client_secret <<< $(az ad sp create-for-rbac \
   --query '{appId: appId, password: password}' \
   --output tsv)
 
-az account list-locations --subscription $subscription_id --output table   
+az account list-locations --query "[].name" -o tsv | xargs 
 
 read -p "Enter the location for blob storage container: " location
 
