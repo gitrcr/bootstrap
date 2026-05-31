@@ -14,16 +14,16 @@ SUBSCRIPTION_NAME=$(az account show --query name -o tsv)
 TENANT_ID=$(az account show --query tenantId -o tsv)
 LOCATION="eastus" # Puedes cambiarlo si lo necesitas
 
-# 2. Generar nombre único para el lab
+# 2. Generar nombre único para la app
 TIMESTAMP=$(date +%s)
-LAB_NAME="lab${TIMESTAMP}"
+APP_NAME="app${TIMESTAMP}"
 
 # 3. Generar Service Principal Temporal (Opcional, si tu flujo lo requiere para el backend o recursos)
 # Si tu flujo usa 'az login' directo (CLI Auth), puedes comentar esta sección y dejar las vars de cliente vacías.
 # Aquí asumo que quieres un SP para el despliegue automático como en tu flujo original.
 echo "🔐 Creando Service Principal temporal para el despliegue..."
 SP_JSON=$(az ad sp create-for-rbac \
-  --name "http://sp-${LAB_NAME}" \
+  --name "http://sp-${APP_NAME}" \
   --role "Contributor" \
   --scopes "/subscriptions/$SUBSCRIPTION_ID" \
   --query "{clientId:appId, clientSecret:password, tenantId:tenant}" \
@@ -46,9 +46,9 @@ client_id       = "$CLIENT_ID"
 client_secret   = "$CLIENT_SECRET"
 
 # --- Configuración del Laboratorio ---
-lab_name        = "$LAB_NAME"
+app_name        = "$APP_NAME"
 location        = "$LOCATION"
-environment     = "lab"
+environment     = "apps"
 
 # --- Configuración Web App Container ---
 plan_sku        = "B1"
@@ -58,7 +58,7 @@ docker_user     = ""
 docker_pass     = ""
 ========================================================================================
 ⚠️  NOTA: Guarda el client_secret en un lugar seguro si planeas usarlo fuera de esta sesión.
-          Este SP se creó con nombre: http://sp-${LAB_NAME}
+          Este SP se creó con nombre: http://sp-${APP_NAME}
 
 📝 Pasos siguientes:
 1. Pega el bloque arriba en: environments/dev/tfvars.rename (y prod si aplica).
