@@ -12,7 +12,7 @@ echo "-----------------------------------------------------------------"
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 SUBSCRIPTION_NAME=$(az account show --query name -o tsv)
 TENANT_ID=$(az account show --query tenantId -o tsv)
-LOCATION="eastus" # Puedes cambiarlo si lo necesitas
+LOCATION="northeurope" # Puedes cambiarlo si lo necesitas
 
 # 2. Generar nombre único para la app
 TIMESTAMP=$(date +%s)
