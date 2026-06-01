@@ -11,20 +11,20 @@ GitHub Actions: exporta credenciales en formato json para configurar el secreto 
 bash <(wget -qO - https://raw.githubusercontent.com/gitrcr/bootstrap/refs/heads/main/az_github_actions.sh)
 ```
 
-## az_terraform.sh
+## tfaz-start.sh
 Exporta bloque de texto (==== copiar entre ====) de credenciales para pegar en terraform.tfvars
 
 ```bash
 # Cloud Shell (bash)
-bash <(wget -qO - https://raw.githubusercontent.com/gitrcr/bootstrap/refs/heads/main/az_terraform.sh)
+bash <(wget -qO - https://raw.githubusercontent.com/gitrcr/bootstrap/refs/heads/main/tfaz-start.sh)
 ```
 
-## az_tfstate_blob.sh
+## tfaz-state.sh
 Crear storage para tfstate de Terraform y exporta bloque de texto (==== copiar entre ====) de credenciales para pegar en terraform.tfvars
 
 ```bash
 # Cloud Shell (bash)
-bash <(wget -qO - https://raw.githubusercontent.com/gitrcr/bootstrap/refs/heads/main/az_tfstate_blob.sh)
+bash <(wget -qO - https://raw.githubusercontent.com/gitrcr/bootstrap/refs/heads/main/tfaz-state.sh)
 ```
 
 ### Ref:
