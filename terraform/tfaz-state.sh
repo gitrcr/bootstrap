@@ -41,3 +41,5 @@ az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_
 
 # Create blob container
 az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+
+echo "Storage Account  = \"$STORAGE_ACCOUNT_NAME\""
