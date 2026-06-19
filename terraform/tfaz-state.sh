@@ -28,6 +28,12 @@ echo "tenant_id       = \"$tenant_id\""
 echo "client_id       = \"$client_id\""
 echo "client_secret   = \"$client_secret\""   
 echo "===="
+echo "===="
+echo "export ARM_CLIENT_ID=\"$subscription_id\""
+echo "export ARM_CLIENT_SECRET=\"$client_secret\""
+echo "export ARM_SUBSCRIPTION_ID=\"$client_id\""
+echo "export ARM_TENANT_ID=\"$tenant_id\""
+echo "===="
 
 RESOURCE_GROUP_NAME=tfstate
 STORAGE_ACCOUNT_NAME=tfazstate${random_id}
